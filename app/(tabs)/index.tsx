@@ -1,49 +1,81 @@
-import React from 'react';
-import { StyleSheet, View } from 'react-native';
-import { WebView } from 'react-native-webview';
+import React, {useEffect, useState} from 'react';
+import { StyleSheet, View, Text } from 'react-native';
+import MapView, { Marker, UrlTile} from 'react-native-maps';
+import * as Location from 'expo-location';
 
-export default function OSMMap() {
-    const html = `
-    <!DOCTYPE html>
-    <html>
-      <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-     crossorigin=""/>
-        <style> body {margin: 0;} #map { height: 100vh; } </style>
-      </head>
-      <body>
-        <div id="map"></div>
-        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-         crossorigin=""></script>
-        <script>
-          var map = L.map('map').setView([52.2297, 21.0122], 13);
-          L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '© OpenStreetMap contributors'
-          }).addTo(map);
-          
-          function onMapClick(e) {
-              var marker = L.marker(e.latlng).addTo(map).bindPopup('Twoja mama');
-          }
-          map.on('click', onMapClick);
-        </script>
-      </body>
-    </html>
-  `;
+
+export default function App() {
+    const [selectedLocation, setSelectedLocation] = useState(null);
+    const [location, setLocation] = useState<Location.LocationObject | null>(null);
+    const [region, setRegion] = useState({
+        latitude: 51.505,
+        longitude: -0.09,
+        latitudeDelta: 0.05,
+        longitudeDelta: 0.05,
+    });
+
+    const handleMapPress = (event: any) => {
+        const coords = event.nativeEvent.coordinate;
+        setSelectedLocation(coords);
+    };
+
+    useEffect(() => {
+        (async () => {
+            const { status } = await Location.requestForegroundPermissionsAsync();
+            if (status === 'granted') {
+                const loc = await Location.getCurrentPositionAsync({});
+                setLocation(loc);
+                setRegion({
+                    ...region,
+                    latitude: loc.coords.latitude,
+                    longitude: loc.coords.longitude,
+                });
+            }
+        })();
+    }, []);
+
+
+    if (!location) {
+        return <Text style={{
+            color: 'red',
+            padding: 16
+        }}>Loading...</Text>;
+    }
 
     return (
         <View style={styles.container}>
-            <WebView
-                originWhitelist={['*']}
-                source={{ html }}
-            />
+            <MapView
+                style={styles.map}
+                region={region}
+                onRegionChangeComplete={setRegion}
+                onPress={handleMapPress}
+            >
+
+                {selectedLocation && (
+                    <Marker
+                        coordinate={selectedLocation}
+                        title="Clicked Location"
+                    />
+                )}
+
+                {location && (
+                    <Marker
+                        coordinate={{ latitude: location.coords.latitude, longitude: location.coords.longitude }}
+                        title="Current Location"
+                        pinColor="blue"
+                    />
+                )}
+                <UrlTile
+                    urlTemplate="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    maximumZ={19}
+                    flipY={false}
+                />
+            </MapView>
         </View>
-    );
+    )
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1 },
+    container: { flex: 1, },
+    map: { flex: 1 }
 });
