@@ -25,6 +25,9 @@
       "output": "static",
       "favicon": "./assets/images/favicon.png"
     },
+    "extra": {
+      "API_KEY": "eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6ImE4M2ZmOTk4ODY2NzRlNzI5ZWY5NDA1ODdiZDczODVkIiwiaCI6Im11cm11cjY0In0="
+    },
     "plugins": [
       "expo-router",
       [
