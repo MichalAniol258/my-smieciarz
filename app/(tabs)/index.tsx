@@ -113,7 +113,6 @@ export default function App() {
                     },
                     (newLocation) => {
                         setLocation(newLocation);
-                        setTracksViewChanges(false);
                     }
                 );
             } catch (err) {
@@ -165,7 +164,6 @@ export default function App() {
         }
     }, [location, initialLocationSet]);
 
-    const [tracksViewChanges, setTracksViewChanges] = useState(true);
 
 
 
