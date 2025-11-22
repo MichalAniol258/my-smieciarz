@@ -1,29 +1,49 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {StyleSheet, View, Text, ActivityIndicator, Button} from 'react-native';
-import MapView, {Marker, MapPressEvent, Region, UrlTile, Polyline} from 'react-native-maps';
+import MapView, {
+    MapPressEvent,
+    Region,
+    Polyline,
+    AnimatedRegion,
+    MarkerAnimated
+} from 'react-native-maps';
 import * as Location from 'expo-location';
 import {GetRoute} from "@/api/openRouteService";
+import { LocationSubscription } from 'expo-location';
 
-interface Coordinate {
-    latitude: number;
-    longitude: number;
-}
+
 
 export default function App() {
-    const [selectedLocation, setSelectedLocation] = useState<Coordinate | null>(null);
+    const [selectedLocation, setSelectedLocation] = useState<AnimatedRegion | null>(null)
     const [location, setLocation] = useState<Location.LocationObject | null>(null);
+    const [coordinate, setCoordinate] = useState<AnimatedRegion | null>(null)
     const [routeCoords, setRouteCoords] = useState<Array<{latitude: number, longitude: number}>>([]);
-    const [region, setRegion] = useState<Region>({
-        latitude: 51.505,
-        longitude: -0.09,
-        latitudeDelta: 0.05,
-        longitudeDelta: 0.05,
-    });
+    const mapRef = useRef<MapView>(null);
+    const [region, setRegion] = useState<Region | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const [initialLocationSet, setInitialLocationSet] = useState(false);
 
     const handleMapPress = (event: MapPressEvent) => {
         const coords = event.nativeEvent.coordinate;
-        setSelectedLocation(coords);
+        if (!selectedLocation) {
+            const newRegion = new AnimatedRegion({
+                latitude: coords.latitude,
+                longitude: coords.longitude,
+                latitudeDelta: 0.05,
+                longitudeDelta: 0.05,
+            });
+            setSelectedLocation(newRegion);
+        } else {
+            selectedLocation.timing({
+                latitude: coords.latitude,
+                longitude: coords.longitude,
+                latitudeDelta: 0.05,
+                longitudeDelta: 0.05,
+                duration: 500,
+                toValue: 0,
+                useNativeDriver: false,
+            }).start();
+        }
     };
 
     const fetchRoutes = async () => {
@@ -50,8 +70,6 @@ export default function App() {
             }));
 
             setRouteCoords(routeCoords);
-
-
             setError(null);
 
         } catch (err: any) {
@@ -61,7 +79,9 @@ export default function App() {
     }
 
     useEffect(() => {
-        (async () => {
+        let locationSubscription: LocationSubscription | null = null;
+
+        const startWatchingLocation = async () => {
             try {
                 const { status } = await Location.requestForegroundPermissionsAsync();
                 if (status !== 'granted') {
@@ -69,20 +89,85 @@ export default function App() {
                     return;
                 }
 
-                const loc = await Location.getCurrentPositionAsync({});
-                setLocation(loc);
+
+                const currentLocation = await Location.getCurrentPositionAsync({
+                    accuracy: Location.Accuracy.High,
+                });
+                setLocation(currentLocation);
+
+
                 setRegion({
-                    latitude: loc.coords.latitude,
-                    longitude: loc.coords.longitude,
+                    latitude: currentLocation.coords.latitude,
+                    longitude: currentLocation.coords.longitude,
                     latitudeDelta: 0.05,
                     longitudeDelta: 0.05,
                 });
+                setInitialLocationSet(true);
+
+
+                locationSubscription = await Location.watchPositionAsync(
+                    {
+                        accuracy: Location.Accuracy.Highest,
+                        timeInterval: 5000,
+                        distanceInterval: 10
+                    },
+                    (newLocation) => {
+                        setLocation(newLocation);
+                        setTracksViewChanges(false);
+                    }
+                );
             } catch (err) {
-                setError('Failed to get location');
+                setError(err instanceof Error ? err.message : 'Failed to get location');
                 console.error(err);
             }
-        })();
+        };
+
+        startWatchingLocation();
+
+        return () => {
+            if (locationSubscription) {
+                locationSubscription.remove();
+            }
+        };
     }, []);
+
+    useEffect(() => {
+        if (!location || !initialLocationSet) return;
+
+
+        if (mapRef.current && location) {
+            mapRef.current.animateToRegion({
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude,
+                latitudeDelta: 0.05,
+                longitudeDelta: 0.05,
+            }, 1000);
+        }
+
+        if (!coordinate) {
+            const newRegion = new AnimatedRegion({
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude,
+                latitudeDelta: 0.05,
+                longitudeDelta: 0.05,
+            });
+            setCoordinate(newRegion);
+        } else {
+            coordinate.timing({
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude,
+                latitudeDelta: 0.05,
+                longitudeDelta: 0.05,
+                duration: 500,
+                useNativeDriver: false,
+                toValue: 0
+            }).start();
+        }
+    }, [location, initialLocationSet]);
+
+    const [tracksViewChanges, setTracksViewChanges] = useState(true);
+
+
 
     if (error) {
         return (
@@ -92,7 +177,7 @@ export default function App() {
         );
     }
 
-    if (!location) {
+    if (!location || !region) {
         return (
             <View style={styles.centerContainer}>
                 <ActivityIndicator size="large" color="#007AFF" />
@@ -104,24 +189,26 @@ export default function App() {
     return (
         <View style={styles.container}>
             <MapView
+                ref={mapRef}
                 style={styles.map}
-                region={region}
+                initialRegion={region}
+                customMapStyle={require('@/assets/style-map.json')}
                 onRegionChangeComplete={setRegion}
                 onPress={handleMapPress}
             >
                 {selectedLocation && (
-                    <Marker
+                    <MarkerAnimated
+                        draggable
+                        image={require('@/assets/images/marker.png')}
                         coordinate={selectedLocation}
                         title="Clicked Location"
                     />
                 )}
 
-                {location && (
-                    <Marker
-                        coordinate={{
-                            latitude: location.coords.latitude,
-                            longitude: location.coords.longitude
-                        }}
+                {location && coordinate && (
+                    <MarkerAnimated
+                        coordinate={coordinate}
+                        anchor={{ x: 0.5, y: 0.5 }}  // Centrowanie markera
                         title="Current Location"
                     >
                         <View style={styles.markerContainer}>
@@ -129,36 +216,28 @@ export default function App() {
                                 <View style={styles.marker} />
                             </View>
                         </View>
-                    </Marker>
+                    </MarkerAnimated>
                 )}
-
 
                 {routeCoords.length > 0 && (
                     <Polyline
                         coordinates={routeCoords}
-                        strokeColor="#0000FF"
+                        strokeColor="#0d9488"
                         strokeWidth={4}
                     />
                 )}
 
-                <UrlTile
 
-                    urlTemplate={'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'}
-                    maximumZ={19}
-
-                    flipY={false}
-                />
             </MapView>
 
-            <Button  onPress={fetchRoutes} title="Get Route" />
+            <Button onPress={fetchRoutes} title="Get Route" />
         </View>
     );
 }
 
-// @ts-ignore
 const styles = StyleSheet.create({
     container: { flex: 1 },
-    map: { flex: 1 },
+    map: { flex: 1},
     centerContainer: {
         flex: 1,
         justifyContent: 'center',
@@ -177,29 +256,33 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     markerContainer: {
-        padding: 0,
-    },
-    radius: {
-        height: 39,
-        width: 39,
-        borderRadius: 20,
-        backgroundColor: 'rgba(0, 122, 255, 0.1)',
-        borderWidth: 1,
-        borderColor: 'rgba(0, 122, 255, 0.3)',
+        width: 32,      // Określ konkretny rozmiar
+        height: 32,
         alignItems: 'center',
         justifyContent: 'center',
+        zIndex: 1000,
+    },
+    radius: {
+        height: 32,
+        width: 32,
+        borderRadius: 20,
+        backgroundColor: 'rgba(52, 211, 153, 0.1)',
+        borderWidth: 1,
+        borderColor: 'rgba(52, 211, 153, 0.3)',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 999,
+        overflow: 'visible',
     },
     marker: {
-        width: 20,
-        height: 20,
+        width: 16,
+        height: 16,
         borderRadius: 10,
         borderWidth: 3,
-        borderColor: 'white',
-        backgroundColor: '#007AFF',
+        borderColor: '#99f6e4',
+        backgroundColor: '#2dd4bf',
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
         elevation: 5,
+        zIndex: 1001,
     },
 });
