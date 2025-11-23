@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {StyleSheet, View, Text, ActivityIndicator, Button} from 'react-native';
+import {StyleSheet, View, Text, ActivityIndicator, Button, Animated} from 'react-native';
 import MapView, {
     MapPressEvent,
     Region,
@@ -10,6 +10,7 @@ import MapView, {
 import * as Location from 'expo-location';
 import {GetRoute} from "@/api/openRouteService";
 import { LocationSubscription } from 'expo-location';
+import AddMarker from "@/components/AddMarker";
 
 
 
@@ -21,10 +22,16 @@ export default function App() {
     const mapRef = useRef<MapView>(null);
     const [region, setRegion] = useState<Region | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const [isVisible, setIsVisible] = useState<boolean>(false);
     const [initialLocationSet, setInitialLocationSet] = useState(false);
 
     const handleMapPress = (event: MapPressEvent) => {
         const coords = event.nativeEvent.coordinate;
+        if (routeCoords.length > 0)
+        {
+            setRouteCoords([]);
+        }
+
         if (!selectedLocation) {
             const newRegion = new AnimatedRegion({
                 latitude: coords.latitude,
@@ -199,7 +206,7 @@ export default function App() {
                         draggable
                         image={require('@/assets/images/marker.png')}
                         coordinate={selectedLocation}
-                        title="Clicked Location"
+                        onPress={() => setIsVisible(true)}
                     />
                 )}
 
@@ -208,6 +215,7 @@ export default function App() {
                         coordinate={coordinate}
                         anchor={{ x: 0.5, y: 0.5 }}  // Centrowanie markera
                         title="Current Location"
+
                     >
                         <View style={styles.markerContainer}>
                             <View style={styles.radius}>
@@ -228,7 +236,10 @@ export default function App() {
 
             </MapView>
 
-            <Button onPress={fetchRoutes} title="Get Route" />
+
+            <AddMarker fetchRoute={fetchRoutes} isVisible={isVisible} setIsVisible={setIsVisible}/>
+
+
         </View>
     );
 }
