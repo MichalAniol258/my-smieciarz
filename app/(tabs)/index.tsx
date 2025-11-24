@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {StyleSheet, View, Text, ActivityIndicator, Button, Animated} from 'react-native';
+import {StyleSheet, View, Text, ActivityIndicator} from 'react-native';
 import MapView, {
     MapPressEvent,
     Region,
@@ -24,6 +24,7 @@ export default function App() {
     const [error, setError] = useState<string | null>(null);
     const [isVisible, setIsVisible] = useState<boolean>(false);
     const [initialLocationSet, setInitialLocationSet] = useState(false);
+
 
     const handleMapPress = (event: MapPressEvent) => {
         const coords = event.nativeEvent.coordinate;
@@ -196,6 +197,7 @@ export default function App() {
             <MapView
                 ref={mapRef}
                 style={styles.map}
+                provider={'google'}
                 initialRegion={region}
                 customMapStyle={require('@/assets/style-map.json')}
                 onRegionChangeComplete={setRegion}
@@ -236,7 +238,6 @@ export default function App() {
 
             </MapView>
 
-
             <AddMarker fetchRoute={fetchRoutes} isVisible={isVisible} setIsVisible={setIsVisible}/>
 
 
@@ -251,7 +252,6 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#fff',
     },
     loadingText: {
         marginTop: 10,
