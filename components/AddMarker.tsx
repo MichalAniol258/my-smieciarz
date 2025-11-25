@@ -8,14 +8,16 @@ import {
     Dimensions, Button, TouchableOpacity,
 } from "react-native";
 import {useEffect, useRef, useState} from "react";
+import {Smietniki} from "@/app/(tabs)";
 
 const SCREEN_HEIGHT = Dimensions.get("window").height;
 const PANEL_HEIGHT = SCREEN_HEIGHT * 0.5;
 
-export default function AddMarker({isVisible, setIsVisible, fetchRoute,}: {
+export default function AddMarker({isVisible, setIsVisible, fetchRoute, data}: {
     isVisible: boolean;
     setIsVisible: (value: boolean) => void;
     fetchRoute: () => void;
+    data: Smietniki | null
 }) {
     const translateY = useRef(new Animated.Value(PANEL_HEIGHT)).current;
 
@@ -91,6 +93,7 @@ export default function AddMarker({isVisible, setIsVisible, fetchRoute,}: {
     }
 
     if (!isVisible) return null;
+    if (!data) return null;
     if (!mounted) return null;
     return (
         <View style={styles.container}>
@@ -103,13 +106,13 @@ export default function AddMarker({isVisible, setIsVisible, fetchRoute,}: {
             >
                 <View style={styles.imageContainer}>
                     <Image
-                        source={require("@/assets/images/rubbish.jpg")}
+                        source={{uri: data.zdjecie ? data.zdjecie : 'marker.png'} }
                         style={styles.img}
                     />
                 </View>
 
                 <View style={styles.textContainer}>
-                    <Text style={styles.text}>Śmieci Gorzyce</Text>
+                    <Text style={styles.text}>{data.nazwa}</Text>
                 </View>
 
                 <View style={styles.textContainer}>

@@ -11,6 +11,24 @@ import * as Location from 'expo-location';
 import {GetRoute} from "@/api/openRouteService";
 import { LocationSubscription } from 'expo-location';
 import AddMarker from "@/components/AddMarker";
+import {supabase} from "@/api/superbase";
+import {Session} from "@supabase/supabase-js";
+import AddNewMarker from "@/components/ui/AddNewMarker";
+
+export type Smietniki = {
+    id: number;
+    nazwa: string;
+    zdjecie: string
+    typ: string;
+    latitude: number;
+    longitude: number;
+    userId: number | null;
+}
+
+export type LocationObject = {
+    latitude: number;
+    longitude: number;
+}
 
 
 
@@ -24,6 +42,74 @@ export default function App() {
     const [error, setError] = useState<string | null>(null);
     const [isVisible, setIsVisible] = useState<boolean>(false);
     const [initialLocationSet, setInitialLocationSet] = useState(false);
+    const [session, setSession] = useState<Session | null>(null);
+    const [data, setData] = useState<Smietniki[]>([]);
+    const [loading, setLoading] = useState(false);
+    const [selectedMarker, setSelectedMarker] = useState<Smietniki | null>(null);
+    const [isVisibleAddMarker, setIsVisibleAddMarker] = useState<boolean>(false);
+    const [compLocations, setCompLocations] = useState<LocationObject | null>(null);
+
+    useEffect(() => {
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            setSession(session)
+            setLoading(false);
+        })
+
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            setSession(session);
+        });
+
+        return () => subscription.unsubscribe();
+    }, [])
+
+    useEffect(() => {
+        if (session) getDaraMarkers();
+    }, [session]);
+
+
+    useEffect(() => {
+        const channel = supabase
+            .channel('markers')
+            .on(
+                'postgres_changes',
+                {
+                    event: 'INSERT',
+                    schema: 'public',
+                    table: 'smietniki'
+                },
+                (payload) => {
+                    setData(prev => [...prev, payload.new as Smietniki]);
+                }
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
+    }, []);
+
+    const getDaraMarkers = async () => {
+        try {
+            setLoading(true)
+            const {data, error, status} = await  supabase
+                .from('smietniki')
+                .select('id, nazwa, typ,zdjecie, latitude, longitude, userId',)
+
+            if (error && status !== 406) {
+                alert(error.message)
+                return
+            }
+
+            if (data) {
+                setData(data)
+            }
+        }catch (e: Error | any) {
+            alert(e.message)
+        } finally {
+            setLoading(false)
+        }
+    }
+
 
 
     const handleMapPress = (event: MapPressEvent) => {
@@ -33,6 +119,11 @@ export default function App() {
             setRouteCoords([]);
         }
 
+        setCompLocations({
+            latitude: coords.latitude,
+            longitude: coords.longitude,
+        });
+
         if (!selectedLocation) {
             const newRegion = new AnimatedRegion({
                 latitude: coords.latitude,
@@ -40,6 +131,7 @@ export default function App() {
                 latitudeDelta: 0.05,
                 longitudeDelta: 0.05,
             });
+
             setSelectedLocation(newRegion);
         } else {
             selectedLocation.timing({
@@ -51,6 +143,7 @@ export default function App() {
                 toValue: 0,
                 useNativeDriver: false,
             }).start();
+
         }
     };
 
@@ -78,6 +171,8 @@ export default function App() {
             }));
 
             setRouteCoords(routeCoords);
+
+
             setError(null);
 
         } catch (err: any) {
@@ -175,6 +270,9 @@ export default function App() {
 
 
 
+
+
+
     if (error) {
         return (
             <View style={styles.centerContainer}>
@@ -208,9 +306,23 @@ export default function App() {
                         draggable
                         image={require('@/assets/images/marker.png')}
                         coordinate={selectedLocation}
-                        onPress={() => setIsVisible(true)}
+                        onPress={() => setIsVisibleAddMarker(true)}
                     />
                 )}
+
+                { data.length > 0 &&
+                    data.map((marker, index) => (
+                        <MarkerAnimated
+                            key={index}
+                            image={require('@/assets/images/marker.png')}
+                            coordinate={{latitude: marker.latitude, longitude: marker.longitude}}
+                            onPress={() => {
+                                setSelectedMarker(marker);
+                                setIsVisible(true);
+                            }}
+                        />
+                    ))
+                }
 
                 {location && coordinate && (
                     <MarkerAnimated
@@ -238,7 +350,8 @@ export default function App() {
 
             </MapView>
 
-            <AddMarker fetchRoute={fetchRoutes} isVisible={isVisible} setIsVisible={setIsVisible}/>
+            <AddNewMarker session={session} data={compLocations} isVisible={isVisibleAddMarker} setIsVisible={setIsVisibleAddMarker}  />
+            <AddMarker data={selectedMarker} fetchRoute={fetchRoutes} isVisible={isVisible} setIsVisible={setIsVisible}/>
 
 
         </View>
