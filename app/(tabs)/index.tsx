@@ -119,10 +119,7 @@ export default function App() {
             setRouteCoords([]);
         }
 
-        setCompLocations({
-            latitude: coords.latitude,
-            longitude: coords.longitude,
-        });
+
 
         if (!selectedLocation) {
             const newRegion = new AnimatedRegion({
@@ -131,7 +128,10 @@ export default function App() {
                 latitudeDelta: 0.05,
                 longitudeDelta: 0.05,
             });
-
+            setCompLocations({
+                latitude: coords.latitude,
+                longitude: coords.longitude,
+            });
             setSelectedLocation(newRegion);
         } else {
             selectedLocation.timing({
@@ -143,6 +143,10 @@ export default function App() {
                 toValue: 0,
                 useNativeDriver: false,
             }).start();
+            setCompLocations({
+                latitude: coords.latitude,
+                longitude: coords.longitude,
+            });
 
         }
     };
