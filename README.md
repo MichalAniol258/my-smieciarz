@@ -10,7 +10,7 @@ wykonaj poniższe kroki:
 1. Sklonuj repozytorium:
 ```bash
 git clone https://github.com/MichalAniol258/my-smieciarz.git
-cd my-smieciarz-master
+cd my-smieciarz
 ```
 2. Zainstaluj zależności:
 ```bash
