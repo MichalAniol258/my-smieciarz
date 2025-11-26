@@ -6,13 +6,13 @@ Aby uruchomić projekt lokalnie, wykonaj poniższe kroki:
 1. Sklonuj repozytorium:
 ```bash
 git clone https://github.com/MichalAniol258/my-smieciarz.git
-cd my-smieciarz
+cd my-smieciarz-master
 ```
 2. Zainstaluj zależności:
 ```bash
-npm install
+npm install --legacy-peer-deps
 # lub
-yarn install
+yarn install --legacy-peer-deps
 ```
 3. Uruchom projekt:
 ```bash
