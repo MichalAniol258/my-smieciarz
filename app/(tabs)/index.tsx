@@ -13,7 +13,7 @@ import { LocationSubscription } from 'expo-location';
 import AddMarker from "@/components/AddMarker";
 import {supabase} from "@/api/superbase";
 import {Session} from "@supabase/supabase-js";
-import AddNewMarker from "@/components/ui/AddNewMarker";
+import AddNewMarker from "@/components/AddNewMarker";
 
 export type Smietniki = {
     id: number;
@@ -284,7 +284,7 @@ export default function App() {
     if (!location || !region) {
         return (
             <View style={styles.centerContainer}>
-                <ActivityIndicator size="large" color="#007AFF" />
+                <ActivityIndicator size="large" color="#2dd4bf" />
                 <Text style={styles.loadingText}>Loading location...</Text>
             </View>
         );
@@ -318,6 +318,14 @@ export default function App() {
                             coordinate={{latitude: marker.latitude, longitude: marker.longitude}}
                             onPress={() => {
                                 setSelectedMarker(marker);
+                                setSelectedLocation(
+                                     new AnimatedRegion({
+                                        latitude: marker.latitude,
+                                        longitude: marker.longitude,
+                                        latitudeDelta: 0.05,
+                                        longitudeDelta: 0.05,
+                                    })
+                                );
                                 setIsVisible(true);
                             }}
                         />
@@ -365,6 +373,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+        backgroundColor: '#020617'
     },
     loadingText: {
         marginTop: 10,

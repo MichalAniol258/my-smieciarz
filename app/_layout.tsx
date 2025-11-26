@@ -22,7 +22,7 @@ export default function RootLayout() {
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
         <StatusBar translucent={true} />
 
-        <View style={{ flex: 1, backgroundColor: 'black'}}>
+        <View style={{ flex: 1, backgroundColor: '#0f172a'}}>
             <Stack>
                 <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
                 <Stack.Screen name="(login)" options={{ headerShown: false }} />

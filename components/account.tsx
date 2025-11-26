@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/api/superbase'
-import { StyleSheet, View, Alert } from 'react-native'
+import {StyleSheet, View, Alert, TouchableOpacity, Text} from 'react-native'
 import { Button, Input } from '@rneui/themed'
 import { Session } from '@supabase/supabase-js'
 
@@ -79,43 +79,49 @@ export default function Account({ session }: { session: Session }) {
 
     return (
         <View style={styles.container}>
-            <View style={[styles.verticallySpaced, styles.mt20]}>
-                <Input style={{color: 'red'}} label="Email" value={session?.user?.email} disabled />
-            </View>
-            <View style={styles.verticallySpaced}>
-                <Input style={{color: 'red'}} label="Username" value={username || ''} onChangeText={(text) => setUsername(text)} />
-            </View>
-            <View style={styles.verticallySpaced}>
-                <Input style={{color: 'red'}} label="Website" value={website || ''} onChangeText={(text) => setWebsite(text)} />
-            </View>
-
-            <View style={[styles.verticallySpaced, styles.mt20]}>
-                <Button
-                    title={loading ? 'Loading ...' : 'Update'}
-                    onPress={() => updateProfile({ username, website, avatar_url: avatarUrl })}
-                    disabled={loading}
-                />
+            <View style={{marginBottom: 20}}>
+                <Text style={{
+                    color: "white",
+                    fontSize: 24,
+                    fontWeight: "bold",
+                }}>
+                    {username}</Text>
             </View>
 
-            <View style={styles.verticallySpaced}>
-                <Button title="Sign Out" onPress={() => supabase.auth.signOut()} />
+            <View style={styles.button}>
+                <TouchableOpacity onPress={() => supabase.auth.signOut()}>
+                    <Text  style={{
+                        color: "black",
+                        fontSize: 16,
+                        fontWeight: "bold",
+                    }}>Sign out</Text>
+                </TouchableOpacity>
             </View>
+
         </View>
     )
 }
 
 const styles = StyleSheet.create({
     container: {
-        marginTop: 40,
-        color: 'red',
-        padding: 12,
+        flex: 1,
+        alignItems: "center",
+        backgroundColor: '#020617',
+        justifyContent: "center",
+
     },
-    verticallySpaced: {
-        paddingTop: 4,
-        paddingBottom: 4,
-        alignSelf: 'stretch',
-    },
-    mt20: {
-        marginTop: 20,
-    },
+    button: {
+        backgroundColor: "#2dd4bf",
+        paddingVertical: 12,
+        paddingHorizontal: 0,
+        borderRadius: 12,
+        width: 150,
+        alignItems: "center",
+        justifyContent: "center",
+        shadowColor: "#000",
+        shadowOffset: {width: 0, height: 2},
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5, // Android shadow
+    }
 })

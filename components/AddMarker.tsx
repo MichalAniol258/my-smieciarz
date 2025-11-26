@@ -116,6 +116,11 @@ export default function AddMarker({isVisible, setIsVisible, fetchRoute, data}: {
                 </View>
 
                 <View style={styles.textContainer}>
+                    {data.typ  ? <Image source={require('@/assets/images/bin.png')}  /> : <Image source={require('@/assets/images/garbage.png')}  />}
+                    <Text style={styles.textImg}>{data.typ}</Text>
+                </View>
+
+                <View style={styles.textContainer}>
                     <TouchableOpacity style={styles.button} onPress={ButtonHandler}>
                         <Text style={styles.buttonText}>Pokaż drogę</Text>
                     </TouchableOpacity>
@@ -136,8 +141,8 @@ const styles = StyleSheet.create({
     },
     component: {
         width: "100%",
-        height: "50%",
-        backgroundColor: "#1B1B1B",
+        height: "55%",
+        backgroundColor: "#020617",
         outlineWidth: 3,
         outlineColor: "#2dd4bf",
         outlineOffset: 1,
@@ -149,11 +154,18 @@ const styles = StyleSheet.create({
     },
     imageContainer: {
         width: "100%",
-        height: "60%",
+        height: "45%",
         overflow: "hidden",
         alignItems: "center",
         padding: 15,
     },
+    textImg: {
+        color: "white",
+        fontSize: 16,
+        fontWeight: "bold",
+        marginLeft: 10,
+    }
+    ,
     img: {
         width: "100%",
         height: "100%",
@@ -162,10 +174,11 @@ const styles = StyleSheet.create({
     },
     textContainer: {
         padding: 15,
+        flexDirection: "row",
     },
     text: {
         color: "white",
-        fontSize: 24,
+        fontSize: 16,
         fontWeight: "bold",
     },
     button: {

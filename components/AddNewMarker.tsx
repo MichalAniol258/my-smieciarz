@@ -28,8 +28,8 @@ export default function AddNewMarker({isVisible, setIsVisible, data, session}: {
     const translateY = useRef(new Animated.Value(PANEL_HEIGHT)).current;
     const [mounted, setMounted] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [nazwa, setNazwa] = useState('test123');
-    const [typ, setTyp] = useState('smietnik');
+    const [nazwa, setNazwa] = useState('');
+    const [typ, setTyp] = useState('');
     const [zdjecie, setZdjecie] = useState<string | null>(null);
 
     const pickImage = async () => {
@@ -206,7 +206,7 @@ export default function AddNewMarker({isVisible, setIsVisible, data, session}: {
                         label="Nazwa"
                         style={{
                             color: "white",
-                            fontSize: 24,
+                            fontSize: 16,
                             fontWeight: "bold",
                         }}
                         onChangeText={setNazwa}
@@ -218,7 +218,7 @@ export default function AddNewMarker({isVisible, setIsVisible, data, session}: {
                         label="Typ (musi byc smietnik albo odpady)"
                         style={{
                             color: "white",
-                            fontSize: 24,
+                            fontSize: 16,
                             fontWeight: "bold",
                         }}
                         onChangeText={setTyp}
@@ -235,7 +235,7 @@ export default function AddNewMarker({isVisible, setIsVisible, data, session}: {
                     </View>
 
                     <View style={styles.bottomButtonContainer}>
-                        <TouchableOpacity style={styles.button} disabled={isLoading}  onPress={insertData}>
+                        <TouchableOpacity style={styles.button2} disabled={isLoading}  onPress={insertData}>
                             <Text style={styles.textButton}>Dodaj znacznik</Text>
                         </TouchableOpacity>
                     </View>
@@ -274,10 +274,9 @@ const styles = StyleSheet.create({
     component: {
         width: "100%",
         height: "75%",
-        backgroundColor: "#1B1B1B",
+        backgroundColor: "#020617",
         borderTopLeftRadius: 22,
         borderTopRightRadius: 22,
-        paddingVertical: 20,
         paddingHorizontal: 16,
         outlineWidth: 3,
         outlineColor: "#2dd4bf",
@@ -304,8 +303,22 @@ const styles = StyleSheet.create({
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.25,
+        height: 'auto'
+        ,
         shadowRadius: 3.84,
         elevation: 5, // Android shadow
+    },
+    button2: {
+        backgroundColor: "#2dd4bf",
+        paddingVertical: 12,
+        paddingHorizontal: 24,
+        borderRadius: 12,
+        alignItems: "center",
+        justifyContent: "center",
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        marginBottom: 100,
     },
     textButton: {
         color: "#1B1B1B",
