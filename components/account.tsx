@@ -1,14 +1,13 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { supabase } from '@/api/superbase'
-import {StyleSheet, View, Alert, TouchableOpacity, Text} from 'react-native'
+import {StyleSheet, View, Alert, TouchableOpacity, Text, ActivityIndicator} from 'react-native'
 import { Button, Input } from '@rneui/themed'
 import { Session } from '@supabase/supabase-js'
 
 export default function Account({ session }: { session: Session }) {
     const [loading, setLoading] = useState(true)
     const [username, setUsername] = useState('')
-    const [website, setWebsite] = useState('')
-    const [avatarUrl, setAvatarUrl] = useState('')
+
 
     useEffect(() => {
         if (session) getProfile()
@@ -30,8 +29,6 @@ export default function Account({ session }: { session: Session }) {
 
             if (data) {
                 setUsername(data.username)
-                setWebsite(data.website)
-                setAvatarUrl(data.avatar_url)
             }
         } catch (error) {
             if (error instanceof Error) {
@@ -77,6 +74,15 @@ export default function Account({ session }: { session: Session }) {
         }
     }
 
+    if (loading) {
+        return (
+            <View style={styles.centerContainer}>
+                <ActivityIndicator size="large" color="#2dd4bf" />
+                <Text style={styles.loadingText}>Loading...</Text>
+            </View>
+        )
+    }
+
     return (
         <View style={styles.container}>
             <View style={{marginBottom: 20}}>
@@ -102,6 +108,7 @@ export default function Account({ session }: { session: Session }) {
     )
 }
 
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -109,6 +116,17 @@ const styles = StyleSheet.create({
         backgroundColor: '#020617',
         justifyContent: "center",
 
+    },
+    centerContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#020617'
+    },
+    loadingText: {
+        marginTop: 10,
+        fontSize: 16,
+        color: '#666',
     },
     button: {
         backgroundColor: "#2dd4bf",

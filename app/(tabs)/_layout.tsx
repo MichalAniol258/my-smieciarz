@@ -47,6 +47,7 @@ export default function TabLayout() {
                     backgroundColor: '#0f172a',
                     position: 'absolute',
                     borderRadius: 32,
+                    bottom: -1,
                     paddingBottom: Platform.OS === 'ios' ? 24 : 8,
                     paddingTop: 8,
                     borderColor: 'transparent',
@@ -81,7 +82,9 @@ export default function TabLayout() {
             />
             <Tabs.Screen
                 name="profile"
+
                 options={{
+
                     title: 'Profile',
                     tabBarIcon: ({ color, focused }) => (
                         <Image

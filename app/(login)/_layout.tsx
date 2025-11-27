@@ -38,7 +38,7 @@ export default function LoginLayout() {
 
     return  (
 
-            <Stack screenOptions={ { headerShown: false }}>
+            <Stack  screenOptions={ { headerShown: false }}>
                 <Stack.Screen name="explore"   />
             </Stack>
     );

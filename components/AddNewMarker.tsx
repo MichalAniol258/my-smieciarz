@@ -16,7 +16,7 @@ import {Session} from "@supabase/supabase-js";
 import * as ImagePicker from 'expo-image-picker';
 import {Paths, File} from "expo-file-system";
 const SCREEN_HEIGHT = Dimensions.get("window").height;
-const PANEL_HEIGHT = SCREEN_HEIGHT * 0.5;
+const PANEL_HEIGHT = SCREEN_HEIGHT * 0.8;
 
 
 export default function AddNewMarker({isVisible, setIsVisible, data, session}: {
@@ -140,7 +140,7 @@ export default function AddNewMarker({isVisible, setIsVisible, data, session}: {
     const panResponder = useRef(
         PanResponder.create({
             onMoveShouldSetPanResponder: (_, gesture) =>
-                Math.abs(gesture.dy) > 5,
+                Math.abs(gesture.dy) > 8,
 
             onPanResponderMove: (_, gesture) => {
                 if (gesture.dy > 0) {
@@ -273,7 +273,7 @@ const styles = StyleSheet.create({
 
     component: {
         width: "100%",
-        height: "75%",
+        height: "80%",
         backgroundColor: "#020617",
         borderTopLeftRadius: 22,
         borderTopRightRadius: 22,
@@ -318,7 +318,6 @@ const styles = StyleSheet.create({
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.25,
-        marginBottom: 100,
     },
     textButton: {
         color: "#1B1B1B",
@@ -328,7 +327,7 @@ const styles = StyleSheet.create({
     ,
 
     imagePickerArea: {
-        flex: 1,
+
         justifyContent: "center",
         alignItems: "center",
         marginTop: 10,

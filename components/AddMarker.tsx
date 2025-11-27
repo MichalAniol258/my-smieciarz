@@ -11,7 +11,7 @@ import {useEffect, useRef, useState} from "react";
 import {Smietniki} from "@/app/(tabs)";
 
 const SCREEN_HEIGHT = Dimensions.get("window").height;
-const PANEL_HEIGHT = SCREEN_HEIGHT * 0.5;
+const PANEL_HEIGHT = SCREEN_HEIGHT * 0.6;
 
 export default function AddMarker({isVisible, setIsVisible, fetchRoute, data}: {
     isVisible: boolean;
@@ -51,7 +51,7 @@ export default function AddMarker({isVisible, setIsVisible, fetchRoute, data}: {
     const panResponder = useRef(
         PanResponder.create({
             onMoveShouldSetPanResponder: (_, gesture) =>
-                Math.abs(gesture.dy) > 5,
+                Math.abs(gesture.dy) > 6,
 
             onPanResponderMove: (_, gesture) => {
                 if (gesture.dy > 0) {
@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
     },
     component: {
         width: "100%",
-        height: "55%",
+        height: "60%",
         backgroundColor: "#020617",
         outlineWidth: 3,
         outlineColor: "#2dd4bf",
