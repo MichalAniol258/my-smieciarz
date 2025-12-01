@@ -1,4 +1,8 @@
 ## Getting Started
+
+Aplikacja umożliwia użytkownikom dodawanie znaczników wskazujących miejsca, w których znajdują się śmieci do zebrania, oraz lokalizacji służących do ich poprawnego wyrzucenia. W przyszłości planowane jest także wprowadzenie systemu nagród — użytkownicy mogliby zdobywać punkty za zbieranie odpadów, a następnie wymieniać je na kody rabatowe do sklepów.
+Obecnie mapa pełni funkcję poglądową i nie odzwierciedla jeszcze rzeczywistych lokalizacji odpadów.
+
 Klucze do api czy bazy danych są juz w projekcie, więc powinny działać
 
 Aby uruchomić projekt lokalnie,należy pobrać aplikacje expo na telefon i ze skanować kod QR albo na komputerze użyć emulatora android.
