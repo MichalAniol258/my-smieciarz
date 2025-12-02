@@ -1,6 +1,6 @@
 ## Getting Started
 
-Aplikacja umożliwia użytkownikom dodawanie znaczników wskazujących miejsca, w których znajdują się śmieci do zebrania, oraz lokalizacji służących do ich poprawnego wyrzucenia. W przyszłości planowane jest także wprowadzenie systemu nagród — użytkownicy mogliby zdobywać punkty za zbieranie odpadów, a następnie wymieniać je na kody rabatowe do sklepów.
+Aplikacja umożliwia użytkownikom dodawanie znaczników wskazujących miejsca, w których znajdują się śmieci do zebrania, oraz lokalizacji służących do ich poprawnego wyrzucenia (przykładowe znaczniki są zrobione w naszej miejscowości w Gorzycach na Podkarpaciu). W przyszłości planowane jest także wprowadzenie systemu nagród — użytkownicy mogliby zdobywać punkty za zbieranie odpadów, a następnie wymieniać je na kody rabatowe do sklepów.
 Obecnie mapa pełni funkcję poglądową i nie odzwierciedla jeszcze rzeczywistych lokalizacji odpadów.
 
 Klucze do api czy bazy danych są juz w projekcie, więc powinny działać
